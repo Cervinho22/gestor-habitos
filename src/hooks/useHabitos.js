@@ -1,74 +1,206 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
+// Etiqueta única para guardar los datos en el navegador
+const clave_almacenamiento = 'gestor-habitos-app';
 
-const clave_almacenamiento = 'gestor-habitos-app';                        // Etiqueta única para guardar los datos en el navegador
+// Devuelve la fecha de hoy a medianoche 
+const getTodayTimestamp = () => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Reinicia la hora a medianoche (00:00:00)
+    return now.getTime();
+};
 
-// Función para leer los hábitos guardados al inicio
-const obtenerHabitosGuardados = () => {
-  try {
-    const datosGuardados = localStorage.getItem(clave_almacenamiento);
-    return datosGuardados ? JSON.parse(datosGuardados) : [];              // Si hay datos, los convertimos de JSON a objetos JavaScript.
-  } catch (error) {
-    console.error("Error al cargar hábitos:", error);
-    return [];
-  }
+// Devuelve el timestamp del inicio del día de AYER
+const getYesterdayTimestamp = () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    return yesterday.getTime();
 };
 
 
+// Función para leer los hábitos guardados en el inicio
+const obtenerHabitosGuardados = () => {
+    try {
+        const datosGuardados = localStorage.getItem(clave_almacenamiento);
+        const listaGuardada = datosGuardados ? JSON.parse(datosGuardados) : [];
+
+        //logica de reinicio de diario/semanal
+        const hoyTimestamp = getTodayTimestamp();
+
+        return listaGuardada.map(habito => {
+            // Aseguramos que las propiedades existen para datos antiguos
+            const rachaActual = habito.racha || 0; 
+            const ultimoCompletado = habito.ultimoCompletado || 0;
+        
+            // Si el hábito ya no está marcado, solo comprobamos si se rompió la racha ayer
+            if (!habito.completado) {
+                const ayerTimestamp = getYesterdayTimestamp();
+                // Si la última vez que lo hicimos fue ANTES de ayer, rompemos la racha
+                if (ultimoCompletado < ayerTimestamp && ultimoCompletado !== 0) {
+                    return { ...habito, racha: 0, ultimoCompletado: ultimoCompletado }; 
+                }
+                return { ...habito, racha: rachaActual, ultimoCompletado: ultimoCompletado };
+            }
+
+
+            if (habito.frecuencia === 'diaria') {
+                if (ultimoCompletado < hoyTimestamp) {
+                    // El hábito debe reiniciarse para el nuevo día.
+                    const ayerTimestamp = getYesterdayTimestamp();
+                
+                    // Si la última vez NO fue AYER, la racha se rompe a 0.
+                    const rachaRota = ultimoCompletado < ayerTimestamp;
+                
+                    return {
+                        ...habito,
+                        completado: false, 
+                        racha: rachaRota ? 0 : rachaActual, // Mantiene si fue ayer, rompe si fue antes
+                        ultimoCompletado: ultimoCompletado // Mantiene el registro de cuándo fue la última vez
+                    };
+                }
+            }
+            return { ...habito, racha: rachaActual, ultimoCompletado: ultimoCompletado };
+        });
+    
+    }catch (error) {
+        console.error("Error al cargar hábitos:", error);
+        return [];
+    }
+};
 
 export function useHabitos() {
-  
-  const [listaHabitos, setListaHabitos] = useState(obtenerHabitosGuardados);  //Inicializamos leyendo lo que tenemos en el LocalStorage
+    const [listaHabitos, setListaHabitos] = useState(obtenerHabitosGuardados); // Inicializamos el estado de localStorage
 
-  
-  useEffect(() => {                                                           //Usamos useEffects para guardar los cambios 
-    try {
-      localStorage.setItem(clave_almacenamiento, JSON.stringify(listaHabitos));
-    } catch (error) {
-      console.error("Error al guardar hábitos:", error);
-    }
-
-  }, [listaHabitos]);                                                          //Dependemos de la lista de habitos                     
+    useEffect(() => {  // Guardamos los hábitos cada vez que 'listaHabitos' cambia
+        try {
+            localStorage.setItem(clave_almacenamiento, JSON.stringify(listaHabitos));
+        }catch (error) {
+            console.error("Error al guardar hábitos:", error);
+        }
+    }, [listaHabitos]);
 
 
-
-  //Funcion para agregar un habito
-  const agregarHabito = (nombre, frecuencia) => {
-    const nuevoHabito = {
-      id: crypto.randomUUID(),
-      nombre: nombre.trim(),
-      frecuencia: frecuencia,
-      completado: false,
-    };
-    setListaHabitos(prevHabitos => [...prevHabitos, nuevoHabito]);              //Creamos una nueva lista: copia de la anterior + el nuevo hábito
-  };
-  
-
-  //Funcion para eliminar un habito
-  const eliminarHabito = (idAEliminar) => {
-    const nuevaLista = listaHabitos.filter(h => h.id !== idAEliminar);          //Usamos filter para crear una nueva lista sin el hábito que tenga ese ID
-    setListaHabitos(nuevaLista);
-  };
-  
-
-  //Funcion que cambia de estado el habito
-  const cambiarEstadoCompletado = (idACambiar) => {
-    const nuevaLista = listaHabitos.map(h => {                                  //Usamos map para recorrer la lista y cambiar solo el hábito con el ID dado
-      if (h.id === idACambiar) {
-        return {
-          ...h,                                                                 //... lo usamos para copiar todo lo que tiene un habito
-          completado: !h.completado, 
+    // Función para añadir un hábito
+    const agregarHabito = (nombre, frecuencia) => {
+        const nuevoHabito = {
+            id: crypto.randomUUID(),
+            nombre: nombre.trim(),    // Trim sirve para quitar los espacios innecesarios
+            frecuencia: frecuencia,
+            completado: false,
+            ultimoCompletado: 0, 
+            racha: 0,            
         };
-      }
-      return h; 
-    });
-    setListaHabitos(nuevaLista);
-  };
+        setListaHabitos(prevHabitos => [...prevHabitos, nuevoHabito]);
+    };
+ 
 
-  return {
-    listaHabitos,
-    agregarHabito,
-    eliminarHabito,
-    cambiarEstadoCompletado,
-  };
+    // Función para eliminar un hábito
+    const eliminarHabito = (idAEliminar) => {
+        const nuevaLista = listaHabitos.filter(h => h.id !== idAEliminar);
+        setListaHabitos(nuevaLista);
+    };
+
+
+    // F. para cambiar de estado el hábito 
+    const cambiarEstadoCompletado = (idACambiar) => {
+        const hoyTimestamp = getTodayTimestamp();
+        const ayerTimestamp = getYesterdayTimestamp();
+
+        const nuevaLista = listaHabitos.map(h => {
+            if (h.id === idACambiar) {
+                if (h.completado) {
+                    let rachaRevertida = h.racha;
+                    let nuevaFechaCompletado = h.ultimoCompletado; // Asume que la última fecha permanece
+
+                    // Si se estaba desmarcando una acción HECHA HOY
+                    if (h.ultimoCompletado === hoyTimestamp) {
+                        //Revertimos la racha: Si la racha era 1, pasa a 0.
+                        rachaRevertida = Math.max(0, h.racha - 1);
+                        if (rachaRevertida > 0) {
+                            // La fecha de último completado debe ser AYER.
+                            nuevaFechaCompletado = ayerTimestamp;
+                        } else {
+                            // Si la racha es 0, no hay último completado.
+                            nuevaFechaCompletado = 0;
+                        }
+                    }
+                
+                    return {
+                        ...h,
+                        completado: false,
+                        racha: rachaRevertida, 
+                        ultimoCompletado: nuevaFechaCompletado 
+                    };
+                } 
+            
+                // --- LÓGICA DE MARCAR (De False a True) ---
+            
+                let nuevaRacha = h.racha || 0;
+                const ultimo = h.ultimoCompletado || 0;
+
+                // Lógica de cálculo de racha
+                if (ultimo === ayerTimestamp) {
+                    // Si la última vez fue AYER, la racha continúa
+                    nuevaRacha += 1;
+                } else if (ultimo < ayerTimestamp && ultimo !== 0) {
+                    // Si la última vez fue ANTES de ayer, la racha se rompe y empieza en 1
+                    nuevaRacha = 1; 
+                } else if (ultimo === 0) {
+                    nuevaRacha = 1;
+                }
+                return {
+                    ...h, 
+                    completado: true,
+                    ultimoCompletado: hoyTimestamp, 
+                    racha: nuevaRacha,              
+                };
+            }
+            return h;
+        });
+        setListaHabitos(nuevaLista);
+    };
+
+
+    // F. para editar un hábito
+    const editarHabito = (idAEditar, nuevoNombre, nuevaFrecuencia) => {
+        const nuevaLista = listaHabitos.map(h => {
+            if (h.id === idAEditar) {
+                return {
+                    ...h, 
+                    nombre: nuevoNombre.trim(),
+                    frecuencia: nuevaFrecuencia,
+                };
+            }
+            return h;
+        });
+        setListaHabitos(nuevaLista);
+    };
+
+
+
+    const metricas = useMemo(() => {
+        const hoyTimestamp = getTodayTimestamp();
+        const totalHabitos = listaHabitos.length; // Miramos la longitud de los hábitos
+        //Solo contamos los completados hoy
+        const completadosHoy = listaHabitos.filter(h => h.ultimoCompletado === hoyTimestamp).length;  
+        const porcentajeCumplimiento = totalHabitos > 0 // Calculamos el porcentaje
+        ? Math.round((completadosHoy / totalHabitos) * 100) 
+        : 0;
+
+        return {
+            totalHabitos,
+            completadosHoy,
+            porcentajeCumplimiento,
+        };
+    }, [listaHabitos]); 
+
+    return {
+        listaHabitos,
+        agregarHabito,
+        eliminarHabito,
+        cambiarEstadoCompletado,
+        editarHabito,
+        metricas, 
+    };
 }

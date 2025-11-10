@@ -1,149 +1,234 @@
-/* Estilos generales */
 body {
-    background-color: #f4f7f9;
-    color: #333;
-    line-height: 1.6;
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f7f6;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
 }
 
+/* Contenedor Principal de la App */
 .contenedor-app {
-    max-width: 650px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
 }
 
 h1 {
-    text-align: center;
-    color: #007bff;
-    margin-bottom: 25px;
-    font-size: 28px;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 10px;
+  color: #007bff;
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
 }
 
-h2 {
-    color: #333;
-    font-size: 20px;
-    margin-top: 30px;
-    margin-bottom: 15px;
+/* * Estilos del Formulario de Añadir Hábito  */
+form {
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 30px;
 }
 
-
-.form-agregar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+form input[type="text"] {
+  flex-grow: 1; 
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  min-width: 150px; 
 }
 
-.form-agregar input, 
-.form-agregar select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    flex-grow: 1;
-    font-size: 16px;
+form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
-.form-agregar button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
+form button[type="submit"] {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex-shrink: 0; 
 }
 
-.form-agregar button:hover {
-    background-color: #0056b3;
+form button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+/* * Estilos de la Lista de Hábitos  */
+.lista-habitos h2 {
+  font-size: 1.2em;
+  color: #333;
+  margin-bottom: 15px;
 }
 
 .lista-habitos ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 .lista-habitos li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #e0e0e0;
-    border-left: 5px solid #007bff; 
-    border-radius: 8px;
-    transition: all 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.lista-habitos li.completado {
+  background-color: #e6ffe6; 
 }
 
 .nombre-habito {
-    font-size: 17px;
-    font-weight: 500;
-}
-
-.frecuencia {
-    margin-left: 10px;
-    color: #6c757d;
-    font-style: italic;
-    font-weight: normal;
-}
-
-
-.lista-habitos li.completado {
-    border-left: 5px solid #4CAF50; 
-    background-color: #e6ffe6;
+  flex-grow: 1;
+  font-size: 1.1em;
+  color: #333;
 }
 
 .lista-habitos li.completado .nombre-habito {
-    text-decoration: line-through; 
-    color: #6a6a6a;
+  text-decoration: line-through;
+  color: #6c757d;
 }
 
-
+/* * Estilos de los Botones de Acción (Completar/Editar/Eliminar)*/
 .acciones {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
+  margin-left: 15px;
+  flex-shrink: 0; 
 }
 
 .acciones button {
-    padding: 8px 12px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    transition: background-color 0.3s, transform 0.1s;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: opacity 0.2s, background-color 0.2s;
 }
 
-.acciones button:active {
-    transform: scale(0.98);
+.acciones button:hover {
+  opacity: 0.8;
 }
 
+/* Colores específicos de los botones */
 .boton-toggle {
-    background-color: #4CAF50; 
-    color: white;
-}
-
-.boton-toggle:hover {
-    background-color: #45a049;
+  background-color: #28a745; 
+  color: white;
 }
 
 .boton-eliminar {
-    background-color: #f44336; 
-    color: white;
+  background-color: #dc3545; 
+  color: white;
 }
 
-.boton-eliminar:hover {
-    background-color: #e53935;
+.boton-editar {
+  background-color: #ffc107; 
+  color: #333;
 }
 
-.mensaje-vacio {
-    text-align: center;
-    padding: 20px;
-    border: 1px dashed #ccc;
-    border-radius: 8px;
-    color: #6c757d;
+/* * Estilos de los elementos en Modo Edición */
+
+.edicion-form {
+  display: flex;
+  gap: 8px;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.edicion-form input {
+  padding: 8px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  flex-grow: 1;
+}
+
+.edicion-form select {
+  padding: 8px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+}
+
+.boton-guardar {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.boton-cancelar {
+  background-color: #6c757d;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+/* * Estilos para las Métricas Visuales */
+.panel-metricas {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding: 15px 0;
+  border-bottom: 1px dashed #ccc;
+}
+
+.metrica-card {
+  background-color: #e9ecef;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  flex-basis: 30%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.metrica-card h3 {
+  font-size: 1.1em;
+  color: #495057;
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.metrica-card p {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #007bff; 
+  margin: 0;
+}
+
+/* Color para el porcentaje de cumplimiento */
+.metrica-card.cumplimiento p {
+    color: #28a745;
+}
+
+/* * Estilos de la Racha (Streak) */
+.racha-tag {
+    margin-left: 15px;
+    padding: 4px 8px;
+    background-color: #ffe0b2; /* Naranja claro para fuego */
+    color: #e65100; /* Naranja oscuro */
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
