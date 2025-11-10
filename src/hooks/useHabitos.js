@@ -1,47 +1,38 @@
 import { useState, useEffect } from 'react';
 
-// Etiqueta única para guardar los datos en el navegador
-const CLAVE_ALMACENAMIENTO = 'gestor-habitos-app';
 
-// ----------------------------------------------------
-// FUNCIONES AUXILIARES PARA LOCALSTORAGE
-// ----------------------------------------------------
+const clave_almacenamiento = 'gestor-habitos-app';                        // Etiqueta única para guardar los datos en el navegador
 
 // Función para leer los hábitos guardados al inicio
 const obtenerHabitosGuardados = () => {
   try {
-    const datosGuardados = localStorage.getItem(CLAVE_ALMACENAMIENTO);
-    // Si hay datos, los convertimos de texto (JSON) a objetos JavaScript.
-    // Si no hay, devolvemos un array vacío [].
-    return datosGuardados ? JSON.parse(datosGuardados) : [];
+    const datosGuardados = localStorage.getItem(clave_almacenamiento);
+    return datosGuardados ? JSON.parse(datosGuardados) : [];              // Si hay datos, los convertimos de JSON a objetos JavaScript.
   } catch (error) {
     console.error("Error al cargar hábitos:", error);
     return [];
   }
 };
 
-// ----------------------------------------------------
-// EL GANCHO PRINCIPAL (HOOK)
-// ----------------------------------------------------
-export function useHabitos() {
-  // 1. ESTADO: Inicializamos el estado llamando a la función que lee localStorage
-  const [listaHabitos, setListaHabitos] = useState(obtenerHabitosGuardados);
 
-  // 2. EFECTO: Guardamos los hábitos cada vez que 'listaHabitos' cambia
-  useEffect(() => {
+
+export function useHabitos() {
+  
+  const [listaHabitos, setListaHabitos] = useState(obtenerHabitosGuardados);  //Inicializamos leyendo lo que tenemos en el LocalStorage
+
+  
+  useEffect(() => {                                                           //Usamos useEffects para guardar los cambios 
     try {
-      // Convertimos el objeto JavaScript a texto (JSON) para guardarlo
-      localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify(listaHabitos));
+      localStorage.setItem(clave_almacenamiento, JSON.stringify(listaHabitos));
     } catch (error) {
       console.error("Error al guardar hábitos:", error);
     }
 
-  }, [listaHabitos]);
+  }, [listaHabitos]);                                                          //Dependemos de la lista de habitos                     
 
-  // ----------------------------------------------------
-  // FUNCIONES PARA MODIFICAR LA LISTA
-  // ----------------------------------------------------
-  
+
+
+  //Funcion para agregar un habito
   const agregarHabito = (nombre, frecuencia) => {
     const nuevoHabito = {
       id: crypto.randomUUID(),
@@ -49,33 +40,31 @@ export function useHabitos() {
       frecuencia: frecuencia,
       completado: false,
     };
-    // Creamos una nueva lista: copia de la anterior + el nuevo hábito
-    setListaHabitos(prevHabitos => [...prevHabitos, nuevoHabito]);
+    setListaHabitos(prevHabitos => [...prevHabitos, nuevoHabito]);              //Creamos una nueva lista: copia de la anterior + el nuevo hábito
   };
   
+
+  //Funcion para eliminar un habito
   const eliminarHabito = (idAEliminar) => {
-    // Usamos filter para crear una nueva lista sin el hábito que tenga ese ID
-    const nuevaLista = listaHabitos.filter(h => h.id !== idAEliminar);
+    const nuevaLista = listaHabitos.filter(h => h.id !== idAEliminar);          //Usamos filter para crear una nueva lista sin el hábito que tenga ese ID
     setListaHabitos(nuevaLista);
   };
   
+
+  //Funcion que cambia de estado el habito
   const cambiarEstadoCompletado = (idACambiar) => {
-    // Usamos map para recorrer la lista y cambiar solo el hábito con el ID dado
-    const nuevaLista = listaHabitos.map(h => {
+    const nuevaLista = listaHabitos.map(h => {                                  //Usamos map para recorrer la lista y cambiar solo el hábito con el ID dado
       if (h.id === idACambiar) {
         return {
-          ...h, // Copiamos el hábito original
-          completado: !h.completado, // Cambiamos el estado opuesto
+          ...h,                                                                 //... lo usamos para copiar todo lo que tiene un habito
+          completado: !h.completado, 
         };
       }
-      return h; // Devolvemos los demás hábitos sin cambios
+      return h; 
     });
     setListaHabitos(nuevaLista);
   };
 
-  // ----------------------------------------------------
-  // RETORNO DEL GANCHO
-  // ----------------------------------------------------
   return {
     listaHabitos,
     agregarHabito,

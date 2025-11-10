@@ -2,24 +2,20 @@ import { useState } from 'react';
 import { useHabitos } from './hooks/useHabitos'; 
 import './App.css'; 
 
-// Exportación Nombrada (coincide con el import { App } en main.jsx)
+
 export function App() { 
-  // 1. Obtener la lista y las funciones del gancho (useHabitos)
-  const { 
+  const {                                                                       //Obtenemos la lista y las funciones de useHabitos
     listaHabitos, 
     agregarHabito, 
     eliminarHabito, 
     cambiarEstadoCompletado 
   } = useHabitos(); 
 
-  // 2. Estado local para el input del nombre
-  const [nombreHabito, setNombreHabito] = useState('');
+  const [nombreHabito, setNombreHabito] = useState('');                          //Usamos el estado local para el input del nombre
   
-  // 3. Estado local para la selección de frecuencia (diaria por defecto)
-  const [frecuenciaSeleccionada, setFrecuenciaSeleccionada] = useState('diaria'); 
+  const [frecuenciaSeleccionada, setFrecuenciaSeleccionada] = useState('diaria');   //Usamos el estado local para la selección de frecuencia (diaria por defecto)
 
-  // 4. Manejador del formulario de añadir
-  const manejarEnvio = (evento) => {
+  const manejarEnvio = (evento) => {                                              //Manejador del formulario de añadir
     evento.preventDefault(); 
     
     const nombreLimpio = nombreHabito.trim();
@@ -27,11 +23,10 @@ export function App() {
       return; 
     }
     
-    // Llamamos a la función del gancho y le pasamos los dos datos
-    agregarHabito(nombreLimpio, frecuenciaSeleccionada); 
+    agregarHabito(nombreLimpio, frecuenciaSeleccionada);                           //Llamamos a la función de useHabitos y le pasamos los dos datos
     
-    setNombreHabito(''); // Limpiamos el input
-    setFrecuenciaSeleccionada('diaria'); // Reiniciamos el selector
+    setNombreHabito('');                                                           // Limpiamos el input
+    setFrecuenciaSeleccionada('diaria');                                           // Reiniciamos el selector
   };
 
   return (
@@ -71,8 +66,7 @@ export function App() {
               {listaHabitos.map(habito => (
                 <li 
                   key={habito.id}
-                  // Si está completado, añade la clase 'completado'
-                  className={habito.completado ? 'completado' : ''} 
+                  className={habito.completado ? 'completado' : ''} // Si está completado, añade la clase 'completado'
                 >
                   <span className="nombre-habito">
                     {habito.nombre} 

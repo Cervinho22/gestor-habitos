@@ -31,7 +31,7 @@ h2 {
     margin-bottom: 15px;
 }
 
-/* --- FORMULARIO --- */
+
 .form-agregar {
     display: flex;
     gap: 10px;
@@ -62,7 +62,6 @@ h2 {
     background-color: #0056b3;
 }
 
-/* --- LISTA DE HÁBITOS --- */
 .lista-habitos ul {
     list-style: none;
     padding: 0;
@@ -76,7 +75,7 @@ h2 {
     margin-bottom: 10px;
     background-color: #f9f9f9;
     border: 1px solid #e0e0e0;
-    border-left: 5px solid #007bff; /* Indicador Pendiente */
+    border-left: 5px solid #007bff; 
     border-radius: 8px;
     transition: all 0.3s;
 }
@@ -93,18 +92,18 @@ h2 {
     font-weight: normal;
 }
 
-/* Estilo para el hábito completado */
+
 .lista-habitos li.completado {
-    border-left: 5px solid #4CAF50; /* Indicador Completado */
+    border-left: 5px solid #4CAF50; 
     background-color: #e6ffe6;
 }
 
 .lista-habitos li.completado .nombre-habito {
-    text-decoration: line-through; /* Tacha el texto */
+    text-decoration: line-through; 
     color: #6a6a6a;
 }
 
-/* --- ACCIONES Y BOTONES --- */
+
 .acciones {
     display: flex;
     gap: 8px;
@@ -124,7 +123,7 @@ h2 {
 }
 
 .boton-toggle {
-    background-color: #4CAF50; /* Verde */
+    background-color: #4CAF50; 
     color: white;
 }
 
@@ -133,7 +132,7 @@ h2 {
 }
 
 .boton-eliminar {
-    background-color: #f44336; /* Rojo */
+    background-color: #f44336; 
     color: white;
 }
 
