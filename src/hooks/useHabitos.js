@@ -24,20 +24,15 @@ const obtenerHabitosGuardados = () => {
     try {
         const datosGuardados = localStorage.getItem(clave_almacenamiento);
         const listaGuardada = datosGuardados ? JSON.parse(datosGuardados) : [];
-
-        //logica de reinicio de diario/semanal
-        const hoyTimestamp = getTodayTimestamp();
+        const hoyTimestamp = getTodayTimestamp();           //logica de reinicio de diario/semanal
 
         return listaGuardada.map(habito => {
-            // Aseguramos que las propiedades existen para datos antiguos
             const rachaActual = habito.racha || 0; 
             const ultimoCompletado = habito.ultimoCompletado || 0;
         
-            // Si el hábito ya no está marcado, solo comprobamos si se rompió la racha ayer
-            if (!habito.completado) {
+            if (!habito.completado) {           // Si el hábito ya no está marcado, solo comprobamos si se rompió la racha ayer
                 const ayerTimestamp = getYesterdayTimestamp();
-                // Si la última vez que lo hicimos fue ANTES de ayer, rompemos la racha
-                if (ultimoCompletado < ayerTimestamp && ultimoCompletado !== 0) {
+                if (ultimoCompletado < ayerTimestamp && ultimoCompletado !== 0) {             // Si la última vez que lo hicimos fue ANTES de ayer, rompemos la racha
                     return { ...habito, racha: 0, ultimoCompletado: ultimoCompletado }; 
                 }
                 return { ...habito, racha: rachaActual, ultimoCompletado: ultimoCompletado };
@@ -46,11 +41,8 @@ const obtenerHabitosGuardados = () => {
 
             if (habito.frecuencia === 'diaria') {
                 if (ultimoCompletado < hoyTimestamp) {
-                    // El hábito debe reiniciarse para el nuevo día.
                     const ayerTimestamp = getYesterdayTimestamp();
-                
-                    // Si la última vez NO fue AYER, la racha se rompe a 0.
-                    const rachaRota = ultimoCompletado < ayerTimestamp;
+                    const rachaRota = ultimoCompletado < ayerTimestamp;                  // Si la última vez NO fue AYER, la racha se rompe a 0.
                 
                     return {
                         ...habito,
@@ -113,15 +105,11 @@ export function useHabitos() {
                     let rachaRevertida = h.racha;
                     let nuevaFechaCompletado = h.ultimoCompletado; // Asume que la última fecha permanece
 
-                    // Si se estaba desmarcando una acción HECHA HOY
-                    if (h.ultimoCompletado === hoyTimestamp) {
-                        //Revertimos la racha: Si la racha era 1, pasa a 0.
+                    if (h.ultimoCompletado === hoyTimestamp) {                      // Si se estaba desmarcando una acción HECHA HOY
                         rachaRevertida = Math.max(0, h.racha - 1);
                         if (rachaRevertida > 0) {
-                            // La fecha de último completado debe ser AYER.
                             nuevaFechaCompletado = ayerTimestamp;
                         } else {
-                            // Si la racha es 0, no hay último completado.
                             nuevaFechaCompletado = 0;
                         }
                     }
@@ -133,18 +121,14 @@ export function useHabitos() {
                         ultimoCompletado: nuevaFechaCompletado 
                     };
                 } 
-            
-                // --- LÓGICA DE MARCAR (De False a True) ---
-            
+                       
                 let nuevaRacha = h.racha || 0;
                 const ultimo = h.ultimoCompletado || 0;
 
                 // Lógica de cálculo de racha
                 if (ultimo === ayerTimestamp) {
-                    // Si la última vez fue AYER, la racha continúa
                     nuevaRacha += 1;
                 } else if (ultimo < ayerTimestamp && ultimo !== 0) {
-                    // Si la última vez fue ANTES de ayer, la racha se rompe y empieza en 1
                     nuevaRacha = 1; 
                 } else if (ultimo === 0) {
                     nuevaRacha = 1;
@@ -179,10 +163,9 @@ export function useHabitos() {
 
 
 
-    const metricas = useMemo(() => {
+    const metricas = useMemo(() => {            //useMemo nos ayuda con el porcentaje
         const hoyTimestamp = getTodayTimestamp();
         const totalHabitos = listaHabitos.length; // Miramos la longitud de los hábitos
-        //Solo contamos los completados hoy
         const completadosHoy = listaHabitos.filter(h => h.ultimoCompletado === hoyTimestamp).length;  
         const porcentajeCumplimiento = totalHabitos > 0 // Calculamos el porcentaje
         ? Math.round((completadosHoy / totalHabitos) * 100) 

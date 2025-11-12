@@ -2,17 +2,12 @@ import { useState } from 'react';
 import { useHabitos } from './hooks/useHabitos'; 
 import './App.css'; 
 
-// ----------------------------------------------------
-// 1. COMPONENTE PARA UN HÁBITO INDIVIDUAL (MANEJA SU PROPIO MODO EDICIÓN)
-// ----------------------------------------------------
 function HabitoItem({ habito, eliminarHabito, cambiarEstadoCompletado, editarHabito }) {
-  // Estado local para saber si estamos editando este hábito
   const [isEditing, setIsEditing] = useState(false);
-  // Estados locales para los valores del formulario de edición
   const [editNombre, setEditNombre] = useState(habito.nombre);
   const [editFrecuencia, setEditFrecuencia] = useState(habito.frecuencia);
 
-  // Maneja el guardado del hábito editado
+  //F. para el guardado del hábito editado
   const handleGuardar = () => {
     if (editNombre.trim() === '') {
       return; 
@@ -21,12 +16,9 @@ function HabitoItem({ habito, eliminarHabito, cambiarEstadoCompletado, editarHab
     setIsEditing(false);
   };
 
-  // Determinar si la racha debe mostrarse
-  const showRacha = habito.racha > 0;
+  const showRacha = habito.racha > 0;   //Lo usamos para mostrar la racha
   
-  // ----------------------------------------------------
-  // RENDERIZADO DEL HÁBITO
-  // ----------------------------------------------------
+//Renderizado
   return (
     <li 
       className={habito.completado ? 'completado' : ''} 
@@ -61,14 +53,13 @@ function HabitoItem({ habito, eliminarHabito, cambiarEstadoCompletado, editarHab
           </button>
         </div>
       ) : (
-        // --- MODO VISUALIZACIÓN ---
+        //MODO VISUALIZACIÓN
         <>
           <span className="nombre-habito">
             {habito.nombre} 
             <small style={{marginLeft: '10px', color: '#6c757d'}}>
                 ({habito.frecuencia})
             </small>
-            {/* NUEVO: Mostrar la Racha */}
             {showRacha && (
                 <span className="racha-tag">
                     🔥 {habito.racha} día{habito.racha > 1 ? 's' : ''}
@@ -103,9 +94,7 @@ function HabitoItem({ habito, eliminarHabito, cambiarEstadoCompletado, editarHab
 }
 
 
-// ----------------------------------------------------
-// 2. COMPONENTE PRINCIPAL (App)
-// ----------------------------------------------------
+//App
 export function App() {
   const { 
     listaHabitos, 
