@@ -1,0 +1,234 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f7f6;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+}
+
+/* Contenedor Principal de la App */
+.contenedor-app {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+}
+
+h1 {
+  color: #007bff;
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+/* Estilos del Formulario de Añadir Hábito  */
+form {
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 30px;
+}
+
+form input[type="text"] {
+  flex-grow: 1; 
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  min-width: 150px; 
+}
+
+form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+form button[type="submit"] {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex-shrink: 0; 
+}
+
+form button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+/* Estilos de la Lista de Hábitos  */
+.lista-habitos h2 {
+  font-size: 1.2em;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.lista-habitos ul {
+  list-style: none;
+  padding: 0;
+}
+
+.lista-habitos li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.lista-habitos li.completado {
+  background-color: #e6ffe6; 
+}
+
+.nombre-habito {
+  flex-grow: 1;
+  font-size: 1.1em;
+  color: #333;
+}
+
+.lista-habitos li.completado .nombre-habito {
+  text-decoration: line-through;
+  color: #6c757d;
+}
+
+/* * Estilos de los Botones de Acción (Completar/Editar/Eliminar)*/
+.acciones {
+  display: flex;
+  gap: 8px;
+  margin-left: 15px;
+  flex-shrink: 0; 
+}
+
+.acciones button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.acciones button:hover {
+  opacity: 0.8;
+}
+
+/* Colores específicos de los botones */
+.boton-toggle {
+  background-color: #28a745; 
+  color: white;
+}
+
+.boton-eliminar {
+  background-color: #dc3545; 
+  color: white;
+}
+
+.boton-editar {
+  background-color: #ffc107; 
+  color: #333;
+}
+
+/* Estilos de los elementos en Modo Edición */
+
+.edicion-form {
+  display: flex;
+  gap: 8px;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.edicion-form input {
+  padding: 8px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  flex-grow: 1;
+}
+
+.edicion-form select {
+  padding: 8px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+}
+
+.boton-guardar {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.boton-cancelar {
+  background-color: #6c757d;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+/* Estilos para las Métricas Visuales */
+.panel-metricas {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding: 15px 0;
+  border-bottom: 1px dashed #ccc;
+}
+
+.metrica-card {
+  background-color: #e9ecef;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  flex-basis: 30%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.metrica-card h3 {
+  font-size: 1.1em;
+  color: #495057;
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.metrica-card p {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #007bff; 
+  margin: 0;
+}
+
+/* Color para el porcentaje de cumplimiento */
+.metrica-card.cumplimiento p {
+    color: #28a745;
+}
+
+/* Estilos de la Racha (Streak) */
+.racha-tag {
+    margin-left: 15px;
+    padding: 4px 8px;
+    background-color: #ffe0b2; 
+    color: #e65100; 
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
