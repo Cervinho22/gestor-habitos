@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.)$ - [R=200,L,
+H=Access-Control-Allow-Origin:,
+H=Access-Control-Allow-Methods:GET,POST,PUT,DELETE,OPTIONS,
+H=Access-Control-Allow-Headers:Content-Type,Authorization,X-Requested-With]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ api.php/$1 [QSA,L]
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1

@@ -1,234 +1,487 @@
+/* --- Variables y Fuentes --- */
+:root {
+    --color-primary: #4f46e5; /* Indigo 600 */
+    --color-primary-dark: #4338ca; /* Indigo 700 */
+    --color-success: #10b981; /* Emerald 500 */
+    --color-success-light: #ecfdf5; /* Emerald 50 */
+    --color-warning: #f59e0b; /* Amber 500 */
+    --color-danger: #ef4444; /* Red 500 */
+    --color-bg-light: #f9fafb; /* Gray 50 */
+    --color-text-dark: #1f2937; /* Gray 800 */
+    --color-text-medium: #6b7280; /* Gray 500 */
+    --color-border: #e5e7eb; /* Gray 200 */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f7f6;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  margin: 0;
-  padding: 20px;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-bg-light); 
+    color: var(--color-text-dark);
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
 }
 
-/* Contenedor Principal de la App */
-.contenedor-app {
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 600px;
+/* --- Contenedor Principal y Responsive --- */
+.app-container, .auth-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-h1 {
-  color: #007bff;
-  text-align: center;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 10px;
+.main-content {
+    width: 90%;
+    max-width: 768px; /* Máximo en tablet/desktop */
+    padding: 20px 0 40px 0;
 }
 
-/* Estilos del Formulario de Añadir Hábito  */
-form {
-  display: flex; 
-  gap: 10px; 
-  margin-bottom: 30px;
+/* --- Encabezado y Navegación --- */
+.header {
+    background-color: white;
+    width: 100%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
 }
 
-form input[type="text"] {
-  flex-grow: 1; 
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  min-width: 150px; 
+.header-content {
+    width: 90%;
+    max-width: 768px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
 }
 
-form select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
 }
 
-form button[type="submit"] {
-  padding: 10px 15px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  flex-shrink: 0; 
+.header-user-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-form button[type="submit"]:hover {
-  background-color: #0056b3;
+.user-info {
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
 }
 
-/* Estilos de la Lista de Hábitos  */
-.lista-habitos h2 {
-  font-size: 1.2em;
-  color: #333;
-  margin-bottom: 15px;
+.btn-logout {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
 }
 
-.lista-habitos ul {
-  list-style: none;
-  padding: 0;
+.btn-logout:hover {
+    background-color: var(--color-border);
 }
 
-.lista-habitos li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  transition: background-color 0.2s;
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin-top: 25px;
+    margin-bottom: 15px;
 }
 
-.lista-habitos li.completado {
-  background-color: #e6ffe6; 
-}
-
-.nombre-habito {
-  flex-grow: 1;
-  font-size: 1.1em;
-  color: #333;
-}
-
-.lista-habitos li.completado .nombre-habito {
-  text-decoration: line-through;
-  color: #6c757d;
-}
-
-/* * Estilos de los Botones de Acción (Completar/Editar/Eliminar)*/
-.acciones {
-  display: flex;
-  gap: 8px;
-  margin-left: 15px;
-  flex-shrink: 0; 
-}
-
-.acciones button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9em;
-  transition: opacity 0.2s, background-color 0.2s;
-}
-
-.acciones button:hover {
-  opacity: 0.8;
-}
-
-/* Colores específicos de los botones */
-.boton-toggle {
-  background-color: #28a745; 
-  color: white;
-}
-
-.boton-eliminar {
-  background-color: #dc3545; 
-  color: white;
-}
-
-.boton-editar {
-  background-color: #ffc107; 
-  color: #333;
-}
-
-/* Estilos de los elementos en Modo Edición */
-
-.edicion-form {
-  display: flex;
-  gap: 8px;
-  flex-grow: 1;
-  align-items: center;
-}
-
-.edicion-form input {
-  padding: 8px;
-  border: 1px solid #007bff;
-  border-radius: 8px;
-  flex-grow: 1;
-}
-
-.edicion-form select {
-  padding: 8px;
-  border: 1px solid #007bff;
-  border-radius: 8px;
-}
-
-.boton-guardar {
-  background-color: #007bff;
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9em;
-}
-
-.boton-cancelar {
-  background-color: #6c757d;
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9em;
-}
-
-/* Estilos para las Métricas Visuales */
-.panel-metricas {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 30px;
-  padding: 15px 0;
-  border-bottom: 1px dashed #ccc;
-}
-
-.metrica-card {
-  background-color: #e9ecef;
-  padding: 15px;
-  border-radius: 10px;
-  text-align: center;
-  flex-basis: 30%;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.metrica-card h3 {
-  font-size: 1.1em;
-  color: #495057;
-  margin-top: 0;
-  margin-bottom: 5px;
-}
-
-.metrica-card p {
-  font-size: 1.8em;
-  font-weight: bold;
-  color: #007bff; 
-  margin: 0;
-}
-
-/* Color para el porcentaje de cumplimiento */
-.metrica-card.cumplimiento p {
-    color: #28a745;
-}
-
-/* Estilos de la Racha (Streak) */
-.racha-tag {
-    margin-left: 15px;
-    padding: 4px 8px;
-    background-color: #ffe0b2; 
-    color: #e65100; 
-    border-radius: 12px;
-    font-size: 0.8em;
-    font-weight: bold;
+/* --- Botones Genéricos --- */
+.btn-primary {
     display: inline-flex;
     align-items: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+    padding: 10px 18px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:disabled {
+    background-color: var(--color-text-medium);
+    cursor: not-allowed;
+}
+
+.habit-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+/* --- Alertas y Placeholders --- */
+.alert-error {
+    background-color: #fee2e2; /* Red 100 */
+    color: var(--color-danger);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--color-danger);
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.no-habits-placeholder {
+    text-align: center;
+    padding: 30px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 2px dashed var(--color-border);
+    margin-top: 20px;
+}
+
+/* --- Tarjetas de Métricas --- */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.metric-card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.metric-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.metric-title {
+    font-size: 0.8rem;
+    color: var(--color-text-medium);
+    margin: 0;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text-dark);
+    margin: 0;
+}
+
+.metric-unit {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-medium);
+}
+
+/* --- Tarjetas de Hábito --- */
+.habit-card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5px solid; /* Usado para el color del hábito */
+    transition: transform 0.2s;
+}
+
+.habit-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
+}
+
+.habit-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+.habit-icon-container {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.habit-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--color-text-dark);
+}
+
+.habit-streak-info {
+    font-size: 0.85rem;
+    color: var(--color-text-medium);
+    margin: 0;
+}
+
+.habit-streak-count {
+    font-weight: 600;
+}
+
+.habit-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.habit-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s, opacity 0.2s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.habit-action-btn.edit { color: var(--color-text-medium); }
+.habit-action-btn.edit:hover { background-color: #e0f2fe; color: #0ea5e9; } /* Blue/Sky */
+
+.habit-action-btn.delete { color: var(--color-text-medium); }
+.habit-action-btn.delete:hover { background-color: #fee2e2; color: var(--color-danger); } /* Red */
+
+.habit-action-btn.toggle {
+    background-color: var(--color-primary); /* Se sobrescribe con el color del hábito en JSX */
+    color: white;
+}
+
+.habit-action-btn.toggle.completed {
+    background-color: var(--color-success) !important;
+}
+
+/* --- Pantalla de Autenticación --- */
+.auth-container {
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: var(--color-bg-light);
+}
+
+.auth-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.auth-subtitle {
+    font-size: 1rem;
+    color: var(--color-text-medium);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* --- Formularios y Inputs --- */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: 5px;
+}
+
+input[type="text"], 
+input[type="email"], 
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Incluir padding y borde en el ancho total */
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); /* Sombra suave para enfoque */
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.input-color-picker {
+    width: 60px;
+    height: 40px;
+    padding: 2px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+}
+
+
+/* --- Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transform: scale(1);
+    transition: transform 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-medium);
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.modal-close-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.icon-close {
+    width: 24px;
+    height: 24px;
+}
+
+.form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Selector de Iconos */
+.icon-picker-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+}
+
+.icon-picker-item {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.icon-picker-item:hover {
+    background-color: var(--color-border);
+}
+
+.icon-picker-item.selected {
+    border-color: var(--color-primary) !important; 
+    /* El color de fondo y el color del icono se establecen en línea en JSX */
+    color: white;
+}
+
+/* Adaptaciones Mobile */
+@media (max-width: 600px) {
+    .header-content, .main-content {
+        width: 95%;
+        padding: 10px 0;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr 1fr; /* 2 columnas en móvil */
+    }
+
+    .habit-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .habit-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
