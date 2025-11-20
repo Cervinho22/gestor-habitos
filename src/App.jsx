@@ -1,84 +1,100 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import './App.css';
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api'; 
-const mapHabitToFrontend = (h) => ({
-    id: h.id,
-    nombre: h.name || h.nombre,
-    frecuencia: h.frequency,
-    completado: h.is_completed || false, 
-    racha: h.current_streak || 0,
-    ultimoCompletado: h.last_completed_at 
-        ? new Date(h.last_completed_at).getTime() 
-        : 0, 
-});
+
+const mapHabitToFrontend = (h) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const lastCompleted = h.last_completed_at 
+        ? new Date(h.last_completed_at).setHours(0, 0, 0, 0)
+        : null;
+    
+    const completado = lastCompleted === today.getTime();
+
+    return {
+        id: h.id,
+        nombre: h.name || h.nombre,
+        frecuencia: h.frequency,
+        completado: completado, 
+        racha: h.current_streak || h.racha || 0,
+        ultimoCompletado: h.last_completed_at 
+            ? new Date(h.last_completed_at).getTime() 
+            : 0,
+    };
+};
 
 const useAppLogic = () => {
     const initialToken = localStorage.getItem('authToken');
+    const initialUser = localStorage.getItem('user');
+    
     const [token, setToken] = useState(initialToken);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(initialUser ? JSON.parse(initialUser) : null);
     const [authError, setAuthError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({}); 
     const [loading, setLoading] = useState(false);
     const [listaHabitos, setListaHabitos] = useState([]);
+
     const apiFetch = useCallback(async (endpoint, method = 'GET', data = null, needsAuth = true) => {
-    const currentToken = localStorage.getItem('authToken');
+        const currentToken = localStorage.getItem('authToken');
 
-    const options = {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    };
+        const options = {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
 
-    if (needsAuth && currentToken) {
-        options.headers['Authorization'] = `Bearer ${currentToken}`;
-    }
-    
-    if (data) {
-        options.body = JSON.stringify(data);
-    }
-
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-
-    if (response.status === 204) { 
-        return null;
-    }
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        let errorData = { message: `Error en la API: ${response.status} - ${response.statusText}` };
-
-        try {
-            errorData = JSON.parse(errorText);
-            
-            if (response.status === 422 && errorData.errors) {
-                throw errorData; 
-            }
-
-        } catch (e) {
-            if (response.status === 401 && needsAuth) {
-                setToken(null);
-                setUser(null);
-                localStorage.removeItem('authToken');
-                setListaHabitos([]); 
-            }
+        if (needsAuth && currentToken) {
+            options.headers['Authorization'] = `Bearer ${currentToken}`;
         }
         
-        throw new Error(errorData.message || `Error en la API: ${response.status}`);
-    }
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
 
-    return response.json();
-}, [token]);
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+
+        if (response.status === 204) { 
+            return null;
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            let errorData = { message: `Error en la API: ${response.status} - ${response.statusText}` };
+
+            try {
+                errorData = JSON.parse(errorText);
+                
+                if (response.status === 422 && errorData.errors) {
+                    throw errorData; 
+                }
+
+            } catch (e) {
+                if (response.status === 401 && needsAuth) {
+                    setToken(null);
+                    setUser(null);
+                    localStorage.removeItem('authToken');
+                    setListaHabitos([]); 
+                }
+            }
+            
+            throw new Error(errorData.message || `Error en la API: ${response.status}`);
+        }
+
+        return response.json();
+    }, [token]);
   
-const handleAuthResponse = (data) => {
-    console.log('✅ Login exitoso, datos:', data);
-    setToken(data.token);
-    setUser(data.user); 
-    localStorage.setItem('authToken', data.token);
-    setAuthError(null);
-    setValidationErrors({});
-    setLoading(false);
-};
+    const handleAuthResponse = (data) => {
+        setToken(data.token);
+        setUser(data.user); 
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setAuthError(null);
+        setValidationErrors({});
+        setLoading(false);
+    };
 
     const login = useCallback(async (email, password) => {
         setLoading(true);
@@ -120,11 +136,13 @@ const handleAuthResponse = (data) => {
             setToken(null);
             setUser(null);
             localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
             setListaHabitos([]); 
             setValidationErrors({});
             setLoading(false);
         }
     }, [token, apiFetch]);
+
     const resetAuthError = useCallback(() => {
         setAuthError(null);
         setValidationErrors({}); 
@@ -141,7 +159,6 @@ const handleAuthResponse = (data) => {
         }
     }, [apiFetch, token]);
 
-    // Efecto para cargar hábitos al iniciar o cambiar el token
     useEffect(() => {
         if (token) {
             cargarHabitos();
@@ -195,7 +212,6 @@ const handleAuthResponse = (data) => {
         }
     };
 
-    // MÉTRICAS CALCULADAS
     const metricas = useMemo(() => {
         const totalHabitos = listaHabitos.length;
         const completadosHoy = listaHabitos.filter(h => h.completado).length; 
@@ -225,85 +241,71 @@ function HabitoItem({ habito, eliminarHabito, cambiarEstadoCompletado, editarHab
 
     const showRacha = habito.racha > 0;
     
-    // Clases Tailwind
-    const liClasses = `flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 mb-3 rounded-xl shadow-md transition duration-300 ${habito.completado ? 'bg-green-50 border-l-4 border-green-500' : 'bg-white border-l-4 border-gray-200 hover:shadow-lg'}`;
-    const buttonBase = "py-2 px-3 text-sm font-medium rounded-lg transition duration-150";
-
     return (
-        <li className={liClasses}>
+        <div className={`habit-item ${habito.completado ? 'completed' : ''}`}>
             {isEditing ? (
-                // --- MODO EDICIÓN ---
-                <div className="flex flex-col sm:flex-row gap-2 w-full items-center">
+                <div className="edit-form">
                     <input
                         type="text"
                         value={editNombre}
                         onChange={(e) => setEditNombre(e.target.value)}
                         placeholder="Nuevo nombre"
-                        className="flex-grow p-2 border rounded-lg w-full sm:w-auto"
+                        className="edit-input"
                     />
                     <select
                         value={editFrecuencia}
                         onChange={(e) => setEditFrecuencia(e.target.value)}
-                        className="p-2 border rounded-lg w-full sm:w-auto"
+                        className="edit-select"
                     >
                         <option value="diaria">Diaria</option>
                         <option value="semanal">Semanal</option>
                     </select>
-                    <div className="flex gap-2 mt-2 sm:mt-0">
-                        <button 
-                            onClick={handleGuardar}
-                            className={`${buttonBase} bg-green-500 text-white hover:bg-green-600`}
-                        >
-                            Guardar
-                        </button>
-                        <button 
-                            onClick={() => setIsEditing(false)}
-                            className={`${buttonBase} bg-gray-300 text-gray-700 hover:bg-gray-400`}
-                        >
-                            Cancelar
-                        </button>
-                    </div>
+                    <button onClick={handleGuardar} className="btn-save">
+                        Guardar
+                    </button>
+                    <button onClick={() => setIsEditing(false)} className="btn-cancel">
+                        Cancelar
+                    </button>
                 </div>
             ) : (
-                // MODO VISUALIZACIÓN
                 <>
-                    <div className="flex flex-col sm:flex-row sm:items-center mb-2 sm:mb-0">
-                        <span className={`text-lg font-semibold ${habito.completado ? 'text-green-700 line-through' : 'text-gray-800'}`}>
+                    <div className="habit-info">
+                        <span className="habit-name">
                             {habito.nombre} 
                         </span>
-                        <small className="ml-0 sm:ml-4 text-gray-500 text-sm">
+                        <small className="habit-frequency">
                             ({habito.frecuencia})
                         </small>
                         {showRacha && (
-                            <span className="ml-0 sm:ml-4 text-yellow-600 text-sm font-medium bg-yellow-100 px-2 py-0.5 rounded-full">
+                            <span className="habit-streak">
                                 🔥 {habito.racha} día{habito.racha > 1 ? 's' : ''}
                             </span>
                         )}
                     </div>
 
-                    <div className="flex gap-2 mt-2 sm:mt-0">
+                    <div className="habit-actions">
                         <button 
                             onClick={() => cambiarEstadoCompletado(habito.id)}
-                            className={`${buttonBase} ${habito.completado ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                            className={`action-btn ${habito.completado ? 'btn-undo' : 'btn-complete'}`}
                         >
-                            {habito.completado ? 'Deshacer' : 'Completar'}
+                            {habito.completado ? 'Reactivar' : 'Completar'}
                         </button>
                         <button 
                             onClick={() => setIsEditing(true)}
-                            className={`${buttonBase} bg-indigo-500 text-white hover:bg-indigo-600`}
+                            className="action-btn btn-edit"
                         >
                             Editar
                         </button>
                         <button 
                             onClick={() => eliminarHabito(habito.id)}
-                            className={`${buttonBase} bg-red-500 text-white hover:bg-red-600`}
+                            className="action-btn btn-delete"
                         >
                             Eliminar
                         </button>
                     </div>
                 </>
             )}
-        </li>
+        </div>
     );
 }
 
@@ -311,7 +313,7 @@ function HabitTrackerApp({ data }) {
     const { listaHabitos, agregarHabito, eliminarHabito, cambiarEstadoCompletado, editarHabito, metricas, logout, user } = data; 
 
     const [nombreHabito, setNombreHabito] = useState('');
-    const [frecuenciaSeleccionada, setFrecuenciaSeleccionada] = useState('diaria'); 
+    const [frecuenciaSeleccionada, setFrecuenciaSeleccionada] = useState('diaria');
 
     const manejarEnvio = (evento) => {
         evento.preventDefault(); 
@@ -322,76 +324,70 @@ function HabitTrackerApp({ data }) {
         setNombreHabito(''); 
         setFrecuenciaSeleccionada('diaria'); 
     };
-    
-    const metricaCardClasses = "bg-white p-5 rounded-xl shadow-lg text-center transition duration-300 transform hover:scale-[1.02] border-t-4 border-blue-400";
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 sm:p-8">
-            <div className="max-w-4xl mx-auto">
-                {/* Header y Logout */}
-                <header className="flex justify-between items-center mb-8 pb-4 border-b border-gray-300">
+        <div className="habit-app">
+            <div className="app-container">
+                <header className="app-header">
                     <div>
-                        <h1 className="text-4xl font-extrabold text-gray-800">Gestor de Hábitos</h1>
-                        <p className="text-sm text-gray-500 mt-1">¡Hola, {user?.name || 'Usuario'}!</p>
+                        <h1 className="app-title">Gestor de Hábitos</h1>
+                        <p className="user-greeting">
+                            <span className="user-dot"></span>
+                            ¡Hola, <span className="user-name">{user?.name || 'Usuario'}!</span>
+                        </p>
                     </div>
                     <button
                         onClick={logout}
-                        className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-semibold shadow-md transition duration-150"
+                        className="action-btn btn-delete"
                     >
                         Cerrar Sesión
                     </button>
                 </header>
 
-                {/* PANEL DE MÉTRICAS */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-                    <div className={metricaCardClasses}>
-                        <h3 className="text-lg font-medium text-gray-600">Total Hábitos</h3>
-                        <p className="text-3xl font-bold text-gray-900 mt-1">{metricas.totalHabitos}</p>
+                <div className="metrics-grid">
+                    <div className="metric-card" style={{borderLeftColor: '#3b82f6'}}>
+                        <h3 className="metric-title">Total Hábitos</h3>
+                        <p className="metric-value">{metricas.totalHabitos}</p>
                     </div>
-                    <div className={metricaCardClasses}>
-                        <h3 className="text-lg font-medium text-gray-600">Completados Hoy</h3>
-                        <p className="text-3xl font-bold text-gray-900 mt-1">{metricas.completadosHoy}</p>
+                    <div className="metric-card" style={{borderLeftColor: '#10b981'}}>
+                        <h3 className="metric-title">Completados Hoy</h3>
+                        <p className="metric-value">{metricas.completadosHoy}</p>
                     </div>
-                    <div className={`${metricaCardClasses} border-t-4 ${metricas.porcentajeCumplimiento >= 80 ? 'border-green-500' : 'border-orange-400'}`}>
-                        <h3 className="text-lg font-medium text-gray-600">Cumplimiento</h3>
-                        <p className="text-3xl font-bold text-gray-900 mt-1">{metricas.porcentajeCumplimiento}%</p>
+                    <div className="metric-card" style={{borderLeftColor: metricas.porcentajeCumplimiento >= 80 ? '#10b981' : '#f59e0b'}}>
+                        <h3 className="metric-title">Cumplimiento</h3>
+                        <p className="metric-value">{metricas.porcentajeCumplimiento}%</p>
                     </div>
                 </div>
 
-                {/* Formulario de Añadir */}
-                <form onSubmit={manejarEnvio} className="flex flex-col sm:flex-row gap-3 p-6 bg-white rounded-xl shadow-lg mb-8">
+                <form onSubmit={manejarEnvio} className="habit-form">
                     <input
                         type="text"
                         placeholder="Ej: Leer 10 págs o 30 min de ejercicio"
                         value={nombreHabito}
                         onChange={(e) => setNombreHabito(e.target.value)}
-                        className="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        className="habit-input"
                     />
                     
                     <select
                         value={frecuenciaSeleccionada}
                         onChange={(e) => setFrecuenciaSeleccionada(e.target.value)}
-                        className="p-3 border border-gray-300 rounded-lg w-full sm:w-1/4"
+                        className="habit-select"
                     >
                         <option value="diaria">Diaria</option>
                         <option value="semanal">Semanal</option>
                     </select>
                     
-                    <button 
-                        type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150 w-full sm:w-auto"
-                    >
+                    <button type="submit" className="habit-submit">
                         Añadir Hábito
                     </button>
                 </form>
 
-                {/* Lista de Hábitos */}
-                <div className="lista-habitos">
-                    <h2 className="text-2xl font-bold text-gray-700 mb-4">Mis Hábitos ({listaHabitos.length})</h2>
+                <div className="habits-list">
+                    <h2 className="habits-title">Mis Hábitos ({listaHabitos.length})</h2>
                     {listaHabitos.length === 0 
-                        ? (<p className="text-gray-500 p-6 bg-white rounded-xl shadow-md">Aún no tienes hábitos registrados. ¡Empieza a construir uno!</p>) 
+                        ? (<div className="empty-state">Aún no tienes hábitos registrados. ¡Empieza a construir uno!</div>) 
                         : (
-                            <ul className="space-y-4">
+                            <div>
                                 {listaHabitos.map(habito => (
                                     <HabitoItem 
                                         key={habito.id}
@@ -401,7 +397,7 @@ function HabitTrackerApp({ data }) {
                                         editarHabito={editarHabito}
                                     />
                                 ))}
-                            </ul>
+                            </div>
                         )
                     }
                 </div>
@@ -416,8 +412,6 @@ function AuthScreen({ login, register, loading, authError, validationErrors, res
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
-    const inputClasses = "w-full p-3 border rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150";
-    const buttonClasses = "w-full py-3 rounded-lg text-white font-bold transition duration-150";
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -429,83 +423,86 @@ function AuthScreen({ login, register, loading, authError, validationErrors, res
             register(name, email, password, passwordConfirm); 
         }
     };
+
     const getErrorClass = (field) => {
-        return validationErrors[field] ? 'border-red-500' : 'border-gray-300';
+        return validationErrors[field] ? 'error' : '';
     };
 
-
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 w-full">
-            <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
-                <h2 className="text-3xl font-extrabold text-gray-900 text-center mb-6">
-                    {isLogin ? 'Iniciar Sesión' : 'Registrarse'}
+        <div className="auth-screen">
+            <div className="auth-card">
+                <div className="auth-logo">
+                    <span>✓</span>
+                </div>
+                <h2 className="auth-title">
+                    {isLogin ? 'Bienvenido' : 'Crear Cuenta'}
                 </h2>
+                <p className="auth-subtitle">
+                    {isLogin ? 'Inicia sesión en tu cuenta' : 'Regístrate para comenzar'}
+                </p>
 
-                {(authError && !validationErrors.email) && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <span className="block sm:inline">{authError}</span>
+                {authError && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6" role="alert">
+                        <span className="block text-sm">{authError}</span>
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4 w-full">
-                    {/* ENVOLTURA CON W-FULL PARA FORZAR APILAMIENTO Y ESPACIO */}
+                <form onSubmit={handleSubmit} className="space-y-4">
                     {!isLogin && (
-                        <div className="w-full">
+                        <div>
                             <input
                                 type="text"
                                 placeholder="Nombre Completo"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 required={!isLogin}
-                                className={`${inputClasses} ${getErrorClass('name')}`}
+                                className={`form-input ${getErrorClass('name')}`}
                             />
-                            {validationErrors.name && <p className="text-red-500 text-sm mt-1">{validationErrors.name[0]}</p>}
+                            {validationErrors.name && <p className="text-red-500 text-sm mt-2 ml-1">{validationErrors.name[0]}</p>}
                         </div>
                     )}
-                    <div className="w-full">
+                    <div>
                         <input
                             type="email"
                             placeholder="Correo Electrónico"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            className={`${inputClasses} ${getErrorClass('email')}`}
+                            className={`form-input ${getErrorClass('email')}`}
                         />
-                        {validationErrors.email && <p className="text-red-500 text-sm mt-1">{validationErrors.email[0]}</p>}
+                        {validationErrors.email && <p className="text-red-500 text-sm mt-2 ml-1">{validationErrors.email[0]}</p>}
                     </div>
-                    <div className="w-full">
+                    <div>
                         <input
                             type="password"
                             placeholder="Contraseña"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            className={`${inputClasses} ${getErrorClass('password')}`}
+                            className={`form-input ${getErrorClass('password')}`}
                         />
-                        {!isLogin && validationErrors.password && <p className="text-red-500 text-sm mt-1">{validationErrors.password[0]}</p>}
+                        {!isLogin && validationErrors.password && <p className="text-red-500 text-sm mt-2 ml-1">{validationErrors.password[0]}</p>}
                     </div>
                     {!isLogin && (
-                        <div className="w-full">
+                        <div>
                             <input
                                 type="password"
                                 placeholder="Confirmar Contraseña"
                                 value={passwordConfirm}
                                 onChange={(e) => setPasswordConfirm(e.target.value)}
                                 required={!isLogin}
-                                className={`${inputClasses} ${getErrorClass('password')}`}
+                                className={`form-input ${getErrorClass('password')}`}
                             />
                         </div>
                     )}
-                    {(isLogin || !validationErrors.password) && validationErrors.passwordConfirm && <p className="text-red-500 text-sm mt-1">{validationErrors.passwordConfirm[0]}</p>}
 
-
-                    <div className="w-full pt-2">
+                    <div className="pt-2">
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`${buttonClasses} ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+                            className="btn-primary"
                         >
-                            {loading ? 'Cargando...' : isLogin ? 'Entrar' : 'Crear Cuenta'}
+                            {loading ? 'Cargando...' : isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
                         </button>
                     </div>
                 </form>
@@ -516,7 +513,7 @@ function AuthScreen({ login, register, loading, authError, validationErrors, res
                             setIsLogin(!isLogin);
                             resetAuthError(); 
                         }}
-                        className="text-sm text-blue-600 hover:text-blue-800 transition duration-150"
+                        className="text-blue-600 hover:text-blue-800 transition duration-150 font-medium"
                     >
                         {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia Sesión'}
                     </button>
@@ -532,13 +529,19 @@ export function App() {
 
     if (loading) {
         return (
-            <div className="font-sans antialiased min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+            <div className="auth-screen">
+                <div className="auth-card">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+                        <p className="text-gray-600 mt-4">Cargando...</p>
+                    </div>
+                </div>
             </div>
         );
     }
+
     return (
-        <div className="font-sans antialiased">
+        <div className="app-container">
             {token 
                 ? <HabitTrackerApp data={appData} /> 
                 : <AuthScreen 

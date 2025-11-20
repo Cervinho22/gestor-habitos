@@ -1,234 +1,405 @@
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f7f6;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+/* Estilos generales */
+.app-container {
   min-height: 100vh;
-  margin: 0;
-  padding: 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Contenedor Principal de la App */
-.contenedor-app {
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.auth-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.auth-card {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f1f5f9;
   width: 100%;
-  max-width: 600px;
+  max-width: 28rem;
 }
 
-h1 {
-  color: #007bff;
+.auth-logo {
+  width: 4rem;
+  height: 4rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.auth-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
   text-align: center;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 10px;
 }
 
-/* Estilos del Formulario de Añadir Hábito  */
-form {
-  display: flex; 
-  gap: 10px; 
-  margin-bottom: 30px;
+.auth-subtitle {
+  color: #6b7280;
+  text-align: center;
+  margin-top: 0.5rem;
 }
 
-form input[type="text"] {
-  flex-grow: 1; 
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  min-width: 150px; 
+/* Inputs */
+.form-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: white;
+  transition: all 0.2s;
 }
 
-form select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+.form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
 }
 
-form button[type="submit"] {
-  padding: 10px 15px;
-  background-color: #007bff;
+.form-input.error {
+  border-color: #ef4444;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   color: white;
+  font-weight: 700;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  flex-shrink: 0; 
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+  transform: translateY(0);
 }
 
-form button[type="submit"]:hover {
-  background-color: #0056b3;
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
 }
 
-/* Estilos de la Lista de Hábitos  */
-.lista-habitos h2 {
-  font-size: 1.2em;
-  color: #333;
-  margin-bottom: 15px;
+.btn-primary:disabled {
+  background: #9ca3af;
+  transform: none;
+  box-shadow: none;
 }
 
-.lista-habitos ul {
-  list-style: none;
-  padding: 0;
+.habit-app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+  padding: 2rem 1rem;
 }
 
-.lista-habitos li {
+.app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  transition: background-color 0.2s;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.lista-habitos li.completado {
-  background-color: #e6ffe6; 
+.app-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.nombre-habito {
-  flex-grow: 1;
-  font-size: 1.1em;
-  color: #333;
+.user-greeting {
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+    font-size: 1.25rem; 
+  font-weight: 500;  
 }
 
-.lista-habitos li.completado .nombre-habito {
+.user-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s;
+  border-left: 4px solid;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+}
+
+.metric-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-top: 0.5rem;
+}
+
+.habit-form {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.habit-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+}
+
+.habit-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.habit-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: white;
+  min-width: 120px;
+}
+
+.habit-submit {
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.habit-submit:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.habits-list {
+  margin-top: 2rem;
+}
+
+.habits-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.habit-item {
+  background: white;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #e5e7eb;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.habit-item.completed {
+  background: #f0fdf4;
+  border-left-color: #10b981;
+}
+
+.habit-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.habit-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.habit-item.completed .habit-name {
+  color: #059669;
   text-decoration: line-through;
-  color: #6c757d;
 }
 
-/* * Estilos de los Botones de Acción (Completar/Editar/Eliminar)*/
-.acciones {
+.habit-frequency {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.habit-streak {
+  background: #fef3c7;
+  color: #d97706;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
   display: flex;
-  gap: 8px;
-  margin-left: 15px;
-  flex-shrink: 0; 
-}
-
-.acciones button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9em;
-  transition: opacity 0.2s, background-color 0.2s;
-}
-
-.acciones button:hover {
-  opacity: 0.8;
-}
-
-/* Colores específicos de los botones */
-.boton-toggle {
-  background-color: #28a745; 
-  color: white;
-}
-
-.boton-eliminar {
-  background-color: #dc3545; 
-  color: white;
-}
-
-.boton-editar {
-  background-color: #ffc107; 
-  color: #333;
-}
-
-/* Estilos de los elementos en Modo Edición */
-
-.edicion-form {
-  display: flex;
-  gap: 8px;
-  flex-grow: 1;
   align-items: center;
+  gap: 0.25rem;
 }
 
-.edicion-form input {
-  padding: 8px;
-  border: 1px solid #007bff;
-  border-radius: 8px;
-  flex-grow: 1;
-}
-
-.edicion-form select {
-  padding: 8px;
-  border: 1px solid #007bff;
-  border-radius: 8px;
-}
-
-.boton-guardar {
-  background-color: #007bff;
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9em;
-}
-
-.boton-cancelar {
-  background-color: #6c757d;
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9em;
-}
-
-/* Estilos para las Métricas Visuales */
-.panel-metricas {
+.habit-actions {
   display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 30px;
-  padding: 15px 0;
-  border-bottom: 1px dashed #ccc;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.metrica-card {
-  background-color: #e9ecef;
-  padding: 15px;
-  border-radius: 10px;
+.action-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-complete {
+  background: #10b981;
+  color: white;
+}
+
+.btn-complete:hover {
+  background: #059669;
+}
+
+.btn-undo {
+  background: #f59e0b;
+  color: white;
+}
+
+.btn-undo:hover {
+  background: #d97706;
+}
+
+.btn-edit {
+  background: #8b5cf6;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #7c3aed;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+}
+
+.edit-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.edit-input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 2px solid #3b82f6;
+  border-radius: 0.5rem;
+  min-width: 150px;
+}
+
+.edit-select {
+  padding: 0.5rem;
+  border: 2px solid #3b82f6;
+  border-radius: 0.5rem;
+  background: white;
+}
+
+.btn-save {
+  background: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+}
+
+.btn-cancel {
+  background: #6b7280;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+}
+
+.empty-state {
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 1rem;
   text-align: center;
-  flex-basis: 30%;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  color: #6b7280;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.metrica-card h3 {
-  font-size: 1.1em;
-  color: #495057;
-  margin-top: 0;
-  margin-bottom: 5px;
-}
-
-.metrica-card p {
-  font-size: 1.8em;
-  font-weight: bold;
-  color: #007bff; 
-  margin: 0;
-}
-
-/* Color para el porcentaje de cumplimiento */
-.metrica-card.cumplimiento p {
-    color: #28a745;
-}
-
-/* Estilos de la Racha (Streak) */
-.racha-tag {
-    margin-left: 15px;
-    padding: 4px 8px;
-    background-color: #ffe0b2; 
-    color: #e65100; 
-    border-radius: 12px;
-    font-size: 0.8em;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+/* Responsive */
+@media (max-width: 768px) {
+  .habit-form {
+    flex-direction: column;
+  }
+  
+  .habit-input, .habit-select, .habit-submit {
+    width: 100%;
+  }
+  
+  .habit-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .habit-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
