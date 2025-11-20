@@ -59,6 +59,7 @@ class HabitController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:500',
             'frequency' => 'required|in:diaria,semanal',
         ]);
 
@@ -69,6 +70,7 @@ class HabitController extends Controller
         $habit = Habit::create([
             'user_id' => $user->id,
             'name' => $request->name,
+            'description' => $request->description,
             'frequency' => $request->frequency,
             'current_streak' => 0,
             'last_completed_at' => null,
@@ -105,13 +107,14 @@ class HabitController extends Controller
         $this->authorizeHabit($habit, $request);
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:500',
             'frequency' => 'required|in:diaria,semanal',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Datos de hábito inválidos.', 'errors' => $validator->errors()], 422);
         }
-        $habit->update($request->only('name', 'frequency'));
+        $habit->update($request->only('name', 'description', 'frequency' ));
 
         return response()->json($habit, 200);
     }

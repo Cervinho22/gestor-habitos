@@ -13,6 +13,7 @@ class Habit extends Model
         'user_id',
         'name', 
         'frequency',
+        'description',
         'current_streak',
         'last_completed_at',
     ];

@@ -403,3 +403,189 @@
     justify-content: flex-end;
   }
 }
+.habit-description {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+/* ===== ANIMACIONES Y TRANSICIONES ===== */
+
+/* Transición suave para todos los elementos */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Animación para cuando se completa un hábito */
+@keyframes celebrate {
+  0% { 
+    transform: scale(1); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  50% { 
+    transform: scale(1.02); 
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+  100% { 
+    transform: scale(1); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes confetti {
+  0% { 
+    opacity: 0; 
+    transform: translateY(0) rotate(0deg); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: translateY(-20px) rotate(180deg); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-40px) rotate(360deg); 
+  }
+}
+
+/* Clase para animación de celebración */
+.habit-completed {
+  animation: celebrate 0.6s ease-in-out;
+}
+
+/* Efecto hover mejorado para tarjetas */
+.metric-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.habit-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Animación para nuevos hábitos */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.habit-item-new {
+  animation: slideIn 0.5s ease-out;
+}
+
+/* Animación para loading */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Animación para botones */
+.btn-primary:hover,
+.habit-submit:hover,
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+/* Efecto para checkmark */
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.checkmark-animation {
+  animation: checkmark 0.5s ease-out;
+}
+
+/* Animación para streak */
+@keyframes fire {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.habit-streak {
+  animation: fire 2s ease-in-out infinite;
+}
+
+/* Transición para formularios */
+.form-input:focus {
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+
+/* Animación para métricas */
+.metric-value {
+  transition: all 0.3s ease;
+}
+
+.metric-value.changed {
+  animation: celebrate 0.5s ease;
+}
+
+/* Efecto de aparición para la app */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-container > * {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Animación para empty state */
+.empty-state {
+  animation: fadeIn 1s ease-out;
+}
+
+/* Efecto para logout */
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+.logout-animation {
+  animation: slideOut 0.5s ease-in-out;
+}

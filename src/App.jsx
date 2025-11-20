@@ -16,6 +16,7 @@ const mapHabitToFrontend = (h) => {
     return {
         id: h.id,
         nombre: h.name || h.nombre,
+        descripcion: h.description || '',
         frecuencia: h.frequency,
         completado: completado, 
         racha: h.current_streak || h.racha || 0,
@@ -165,10 +166,14 @@ const useAppLogic = () => {
         }
     }, [cargarHabitos, token]);
     
-    const agregarHabito = async (nombre, frecuencia) => {
+    const agregarHabito = async (nombre, descripcionHabito, frecuencia) => {
         if (!nombre.trim() || !token) return;
         try {
-            const nuevoHabitoDB = await apiFetch('/habits', 'POST', { name: nombre.trim(), frequency: frecuencia }, true);
+            const nuevoHabitoDB = await apiFetch('/habits', 'POST', { 
+                name: nombre.trim(),
+                frequency: frecuencia, 
+                description: descripcionHabito.trim(), 
+            }, true);
             const habitoParaFrontend = mapHabitToFrontend(nuevoHabitoDB);
             setListaHabitos(prevHabitos => [...prevHabitos, habitoParaFrontend]);
         } catch (error) {
@@ -189,10 +194,14 @@ const useAppLogic = () => {
         }
     };
 
-    const editarHabito = async (idAEditar, nuevoNombre, nuevaFrecuencia) => {
+    const editarHabito = async (idAEditar, nuevoNombre, nuevaDescripcion, nuevaFrecuencia) => {
         if (!nuevoNombre.trim() || !token) return;
         try {
-            const habitActualizadoDB = await apiFetch(`/habits/${idAEditar}`, 'PUT', { name: nuevoNombre.trim(), frequency: nuevaFrecuencia }, true);
+            const habitActualizadoDB = await apiFetch(`/habits/${idAEditar}`, 'PUT', {
+                name: nuevoNombre.trim(),
+                description: nuevaDescripcion.trim(), 
+                frequency: nuevaFrecuencia 
+            }, true);
             const habitActualizadoFrontend = mapHabitToFrontend(habitActualizadoDB);
             setListaHabitos(prevHabitos => prevHabitos.map(h => 
                 h.id === idAEditar ? habitActualizadoFrontend : h
@@ -231,25 +240,40 @@ const useAppLogic = () => {
 function HabitoItem({ habito, eliminarHabito, cambiarEstadoCompletado, editarHabito }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editNombre, setEditNombre] = useState(habito.nombre);
+    const [editDescripcion, setEditDescripcion] = useState(habito.descripcion || '');
     const [editFrecuencia, setEditFrecuencia] = useState(habito.frecuencia);
+    const [isAnimating, setIsAnimating] = useState(false); // ← NUEVO ESTADO PARA ANIMACIÓN
+
+    const handleCompletar = async () => {
+        setIsAnimating(true); // ← ACTIVAR ANIMACIÓN
+        await cambiarEstadoCompletado(habito.id);
+        // La animación se desactiva sola cuando el componente se actualiza
+    };
 
     const handleGuardar = () => {
         if (editNombre.trim() === '') return;
-        editarHabito(habito.id, editNombre, editFrecuencia);
+        editarHabito(habito.id, editNombre, editDescripcion, editFrecuencia);
         setIsEditing(false);
     };
 
     const showRacha = habito.racha > 0;
     
     return (
-        <div className={`habit-item ${habito.completado ? 'completed' : ''}`}>
+        <div className={`habit-item ${habito.completado ? 'completed' : ''} ${isAnimating ? 'habit-completed' : ''}`}>
             {isEditing ? (
                 <div className="edit-form">
                     <input
                         type="text"
                         value={editNombre}
                         onChange={(e) => setEditNombre(e.target.value)}
-                        placeholder="Nuevo nombre"
+                        placeholder="Nombre"
+                        className="edit-input"
+                    />
+                    <input
+                        type="text"
+                        value={editDescripcion}
+                        onChange={(e) => setEditDescripcion(e.target.value)}
+                        placeholder="Descripción"
                         className="edit-input"
                     />
                     <select
@@ -270,9 +294,16 @@ function HabitoItem({ habito, eliminarHabito, cambiarEstadoCompletado, editarHab
             ) : (
                 <>
                     <div className="habit-info">
-                        <span className="habit-name">
-                            {habito.nombre} 
-                        </span>
+                        <div>
+                            <span className="habit-name">
+                                {habito.nombre} 
+                            </span>
+                            {habito.descripcion && (
+                                <p className="habit-description">
+                                    {habito.descripcion}
+                                </p>
+                            )}
+                        </div>
                         <small className="habit-frequency">
                             ({habito.frecuencia})
                         </small>
@@ -285,7 +316,7 @@ function HabitoItem({ habito, eliminarHabito, cambiarEstadoCompletado, editarHab
 
                     <div className="habit-actions">
                         <button 
-                            onClick={() => cambiarEstadoCompletado(habito.id)}
+                            onClick={handleCompletar} // ← CAMBIAR POR handleCompletar
                             className={`action-btn ${habito.completado ? 'btn-undo' : 'btn-complete'}`}
                         >
                             {habito.completado ? 'Reactivar' : 'Completar'}
@@ -313,6 +344,7 @@ function HabitTrackerApp({ data }) {
     const { listaHabitos, agregarHabito, eliminarHabito, cambiarEstadoCompletado, editarHabito, metricas, logout, user } = data; 
 
     const [nombreHabito, setNombreHabito] = useState('');
+    const [descripcionHabito, setDescripcionHabito] = useState('');
     const [frecuenciaSeleccionada, setFrecuenciaSeleccionada] = useState('diaria');
 
     const manejarEnvio = (evento) => {
@@ -320,8 +352,9 @@ function HabitTrackerApp({ data }) {
         const nombreLimpio = nombreHabito.trim();
         if (nombreLimpio === '') return;
         
-        agregarHabito(nombreLimpio, frecuenciaSeleccionada); 
+        agregarHabito(nombreLimpio, descripcionHabito, frecuenciaSeleccionada); 
         setNombreHabito(''); 
+        setDescripcionHabito('');
         setFrecuenciaSeleccionada('diaria'); 
     };
 
@@ -359,14 +392,21 @@ function HabitTrackerApp({ data }) {
                     </div>
                 </div>
 
-                <form onSubmit={manejarEnvio} className="habit-form">
-                    <input
-                        type="text"
-                        placeholder="Ej: Leer 10 págs o 30 min de ejercicio"
-                        value={nombreHabito}
-                        onChange={(e) => setNombreHabito(e.target.value)}
-                        className="habit-input"
-                    />
+            <form onSubmit={manejarEnvio} className="habit-form">
+                <input
+                    type="text"
+                    placeholder="Nombre del hábito (ej: Leer)"
+                    value={nombreHabito}
+                    onChange={(e) => setNombreHabito(e.target.value)}
+                    className="habit-input"
+                />
+                <input
+                    type="text"
+                    placeholder="Descripción (ej: 30 minutos al día)"
+                    value={descripcionHabito}
+                    onChange={(e) => setDescripcionHabito(e.target.value)}
+                    className="habit-input"
+                />
                     
                     <select
                         value={frecuenciaSeleccionada}
